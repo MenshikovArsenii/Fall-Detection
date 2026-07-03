@@ -1,0 +1,108 @@
+video_path: "videos/v10.mp4"
+
+output_dir: "output"
+
+roi_polygon:
+  - [742, 925]
+  - [1215, 1025]
+  - [1156, 1]
+  - [848, 1]
+
+scene_roi:
+  enabled: true
+  method: "auto"
+  model_path: "models/stair_escalator_yoloseg.pt"
+  classes: ["danger_zone"]
+  min_confidence: 0.25
+  padding_px: 5
+  use_all_masks: true
+  max_masks: 2
+  min_mask_area_ratio: 0.01
+  per_frame: true
+  update_every_n_frames: 5
+  smooth_alpha: 0.80
+  fallback_to_lines: false
+
+preprocess:
+  crop_to_roi: false
+  resize_width: 640
+  clahe: true
+  denoise: false
+
+zone_membership:
+  method: "bbox_bottom"
+  bottom_points: 5
+  roi_memory_frames: 25
+
+person_detector:
+  enabled: true
+  model_path: "yolo11n.pt"
+  confidence: 0.20
+  iou: 0.50
+  imgsz: 640
+  device: "cpu"
+  max_persons: 6
+  person_class_id: 0
+  min_bbox_height_px: 20
+  min_bbox_area_ratio: 0.0003
+  crop_padding_ratio: 0.35
+
+pose:
+  model_url: "https://tfhub.dev/google/movenet/multipose/lightning/1"
+  input_size: 256
+  min_keypoint_score: 0.08
+  min_pose_score: 0.06
+  max_persons: 4
+
+pose_filter:
+  enabled: true
+  keep_only_roi_candidates: true
+  min_valid_keypoints: 4
+  min_avg_keypoint_score: 0.06
+  min_bbox_height_px: 20
+  min_bbox_area_ratio: 0.0003
+  max_bbox_area_ratio: 0.70
+  min_roi_intersection_ratio: 0.001
+
+optical_flow:
+  enabled: true
+  pyr_scale: 0.5
+  levels: 3
+  winsize: 15
+  iterations: 3
+  poly_n: 5
+  poly_sigma: 1.2
+
+tracking:
+  max_distance_px: 120
+  max_missing_frames: 12
+
+sequence:
+  length: 20
+  min_frames_for_decision: 8
+
+lstm:
+  enabled: true
+  model_path: "models/lstm_multi_fixed.keras"
+  threshold: 0.22
+  fall_class_index: 1
+  keypoint_order: "yxs"
+
+postprocess:
+  require_roi: true
+  require_low_state_frames: 1
+  require_consecutive_fall_frames: 1
+  fall_cooldown_frames: 10
+
+rules:
+  low_height_ratio: 0.85
+  horizontal_aspect_ratio: 0.90
+  center_speed_threshold: 6.0
+  flow_mag_threshold: 1.5
+  min_avg_keypoint_score: 0.06
+
+preview:
+  save_video: true
+  draw_keypoints: true
+  draw_roi: true
+  fps: null

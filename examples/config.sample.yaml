@@ -1,0 +1,43 @@
+video_path: "videos/escalator.mp4"
+output_dir: "output"
+roi_polygon:
+  - [420, 80]
+  - [1050, 80]
+  - [1200, 900]
+  - [420, 900]
+preprocess:
+  crop_to_roi: true
+  resize_width: 640
+  clahe: true
+  denoise: false
+pose:
+  model_url: "https://tfhub.dev/google/movenet/multipose/lightning/1"
+  input_size: 256
+  min_keypoint_score: 0.15
+  min_pose_score: 0.12
+  max_persons: 6
+optical_flow:
+  enabled: true
+tracking:
+  max_distance_px: 120
+  max_missing_frames: 12
+sequence:
+  length: 20
+  min_frames_for_decision: 8
+lstm:
+  enabled: true
+  model_path: "models/lstm_fall.keras"
+  threshold: 0.65
+postprocess:
+  require_low_state_frames: 5
+  require_consecutive_fall_frames: 4
+rules:
+  low_height_ratio: 0.70
+  horizontal_aspect_ratio: 1.10
+  center_speed_threshold: 12.0
+  flow_mag_threshold: 2.5
+  min_avg_keypoint_score: 0.18
+preview:
+  save_video: true
+  draw_keypoints: true
+  draw_roi: true

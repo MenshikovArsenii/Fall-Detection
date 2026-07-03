@@ -1,0 +1,12 @@
+roi_polygon:
+- - 635
+  - 19
+- - 1180
+  - 20
+- - 1377
+  - 835
+- - 958
+  - 806
+class_name: danger_zone
+confidence: 0.9616335034370422
+source: yolo_seg

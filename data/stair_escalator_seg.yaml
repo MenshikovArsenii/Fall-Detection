@@ -1,0 +1,6 @@
+path: datasets/stair_escalator
+train: images/train
+val: images/val
+names:
+  0: stairs
+  1: escalator

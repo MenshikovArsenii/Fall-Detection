@@ -13,11 +13,6 @@ class PersonBox:
 
 
 class YoloPersonDetector:
-    """YOLO person detector used before MoveNet.
-
-    It finds person bounding boxes on the original frame. Then MoveNet can be run
-    on enlarged person crops instead of the entire CCTV frame.
-    """
 
     def __init__(self, cfg: Dict[str, Any]):
         self.enabled = bool(cfg.get("enabled", False))

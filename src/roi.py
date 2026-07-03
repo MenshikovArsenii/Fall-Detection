@@ -46,7 +46,6 @@ class ROI:
         return m
 
     def crop(self, frame: np.ndarray) -> tuple[np.ndarray, tuple[int, int]]:
-        """Return bounding crop around ROI and the top-left offset."""
         if not self.is_valid:
             return frame.copy(), (0, 0)
         x, y, w, h = self.bounding_rect()

@@ -11,7 +11,6 @@ from .tracking import Track
 
 
 class SequenceClassifier:
-    """LSTM if weights exist, rule-based fallback otherwise."""
 
     def __init__(self, cfg: Dict[str, Any]):
         self.sequence_len = int(cfg.get("sequence", {}).get("length", 20))

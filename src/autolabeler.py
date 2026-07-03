@@ -22,12 +22,7 @@ from .tracking import SimpleTracker
 from .visualization import draw_result
 
 def keypoints_to_lstm_vector(keypoints: np.ndarray, frame_width: int, frame_height: int, order: str = "yxs") -> np.ndarray:
-    """Return 51 MoveNet-style features: 17 keypoints * (coord1, coord2, score).
 
-    Many MoveNet LSTM models are trained on normalized keypoints in the order
-    y, x, confidence. The order can be changed in config if your model was
-    trained differently.
-    """
     if keypoints is None or keypoints.size == 0:
         return np.zeros((51,), dtype=np.float32)
     kps = np.asarray(keypoints, dtype=np.float32).reshape(17, 3)
@@ -119,11 +114,7 @@ class FallAutoLabeler:
         return detections
 
     def _detect_poses_with_yolo_person(self, frame: np.ndarray) -> List[PoseDetection]:
-        """YOLO-person -> crop человека -> MoveNet.
 
-        Это помогает на CCTV: человек может быть маленьким на полном кадре,
-        а после YOLO-crop MoveNet получает увеличенный фрагмент с человеком.
-        """
         if self.person_detector is None:
             return []
 
@@ -154,14 +145,12 @@ class FallAutoLabeler:
             kps[:, 0] += float(x1)
             kps[:, 1] += float(y1)
 
-            # Для стабильности используем bbox от YOLO, а не от MoveNet.
             detections.append(PoseDetection(keypoints=kps, bbox=pb.bbox, score=max(float(best.score), float(pb.score))))
 
         return detections
 
 
     def _smooth_polygon(self, old_polygon, new_polygon):
-        """Сглаживает ROI между кадрами, чтобы граница не дрожала на preview."""
         if not old_polygon or not new_polygon or len(old_polygon) != len(new_polygon):
             return new_polygon
         a = float(np.clip(self.scene_smooth_alpha, 0.0, 1.0))
@@ -173,12 +162,6 @@ class FallAutoLabeler:
         return out
 
     def _update_scene_roi_for_frame(self, frame: np.ndarray, frame_idx: int) -> None:
-        """Обновляет границы лестницы/эскалатора.
-
-        Если scene_roi.per_frame=true, YOLO-seg запускается регулярно.
-        Это нужно для видео с меняющимся ракурсом или движущейся камерой.
-        Если модель на кадре ничего не нашла, используется последняя нормальная ROI.
-        """
         if self.scene_detector is None:
             return
         if (frame_idx - 1) % self.scene_update_every != 0:
@@ -223,7 +206,6 @@ class FallAutoLabeler:
         return float(mask.sum()) / float(mask.size)
 
     def _is_good_pose_detection(self, det: PoseDetection, frame_shape) -> bool:
-        """Удаляет лишние скелеты MoveNet: слабые, слишком маленькие и явно вне зоны."""
         fcfg = self.cfg.get("pose_filter", {})
         if not bool(fcfg.get("enabled", True)):
             return True
